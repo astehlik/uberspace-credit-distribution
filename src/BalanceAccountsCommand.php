@@ -216,7 +216,7 @@ class BalanceAccountsCommand extends Command
     {
         $parsableValue = str_replace(' ', ' ', $formattedValue);
         $parsedAmount = $this->formatter->parseCurrency($parsableValue, $curr);
-        Assert::float($parsedAmount, 'Scaped amount could not be parsed to float: ' . $formattedValue);
+        Assert::float($parsedAmount, 'Scraped amount could not be parsed to float: ' . $formattedValue);
         return (int)($parsedAmount * 100);
     }
 
