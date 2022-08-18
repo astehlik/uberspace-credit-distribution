@@ -38,11 +38,11 @@ First, start Firefox with enabled remote control server:
 firefox --marionette
 ```
 
-### Run geckodriver
-
 Now log on to the [Userspace Dashboard](https://dashboard.uberspace.de) with your OpenId.
 You should be able to switch to all the accounts that you want to fill up and to
 the source account.
+
+### Run geckodriver
 
 Download and extract [geckodriver](https://github.com/mozilla/geckodriver). Tell it
 to connect to your running Firefox instance:
