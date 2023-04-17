@@ -61,6 +61,13 @@ class BalanceAccountsCommand extends Command
             InputOption::VALUE_NONE,
             'If provided, the accounts are filled up for real. Otherwise only information is displayed.'
         );
+
+        $this->addOption(
+            'exclude',
+            'c',
+            InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+            'The given accounts are excluded from the filling up process.'
+        );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -97,6 +104,7 @@ class BalanceAccountsCommand extends Command
     private function collectSessionData(): Session
     {
         $sourceAccountName = $this->input->getArgument('source');
+        $excludedAccountNames = array_map('strtolower', $this->input->getOption('exclude') ?? []);
         $sourceAccount = null;
         $selectedAccount = null;
         $targetAccounts = [];
@@ -115,6 +123,11 @@ class BalanceAccountsCommand extends Command
                 $amountInCents,
                 $priceInCents
             );
+
+            if (in_array(strtolower($account->getName()), $excludedAccountNames, true)) {
+                $this->output->writeln('Excluding account ' . $account->getName());
+                continue;
+            }
 
             if (count($columns[0]->findElements(WebDriverBy::tagName('strong'))) === 1) {
                 Assert::null($selectedAccount, 'Duplicated selected account detected!');
@@ -168,7 +181,7 @@ class BalanceAccountsCommand extends Command
             );
     }
 
-    private function fillUpAccounts(Session $session)
+    private function fillUpAccounts(Session $session): void
     {
         $targetAmount = (float)$this->input->getArgument('amount');
         $targetAmountInCents = (int)($targetAmount * 100);
