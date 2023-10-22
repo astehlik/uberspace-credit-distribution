@@ -124,14 +124,14 @@ class BalanceAccountsCommand extends Command
                 $priceInCents
             );
 
-            if (in_array(strtolower($account->getName()), $excludedAccountNames, true)) {
-                $this->output->writeln('Excluding account ' . $account->getName());
-                continue;
-            }
-
             if (count($columns[0]->findElements(WebDriverBy::tagName('strong'))) === 1) {
                 Assert::null($selectedAccount, 'Duplicated selected account detected!');
                 $selectedAccount = $account;
+            }
+
+            if (in_array(strtolower($account->getName()), $excludedAccountNames, true)) {
+                $this->output->writeln('Excluding account ' . $account->getName());
+                continue;
             }
 
             if ($account->getName() === $sourceAccountName) {
