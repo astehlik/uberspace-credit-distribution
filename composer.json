@@ -16,13 +16,13 @@
         "ext-ctype": "*",
         "ext-iconv": "*",
         "ext-intl": "*",
-        "php-webdriver/webdriver": "^1.12",
-        "symfony/console": "6.1.*",
-        "symfony/dotenv": "6.1.*",
-        "symfony/flex": "^2",
-        "symfony/framework-bundle": "6.1.*",
-        "symfony/runtime": "6.1.*",
-        "symfony/yaml": "6.1.*",
+        "php-webdriver/webdriver": "^1.15",
+        "symfony/console": "^7.0",
+        "symfony/dotenv": "^7.0",
+        "symfony/flex": "^2.0",
+        "symfony/framework-bundle": "^7.0",
+        "symfony/runtime": "^7.0",
+        "symfony/yaml": "^7.0",
         "webmozart/assert": "^1.11"
     },
     "config": {
@@ -74,7 +74,7 @@
     "extra": {
         "symfony": {
             "allow-contrib": false,
-            "require": "6.1.*"
+            "require": "^7.0"
         }
     }
 }
