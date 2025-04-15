@@ -11,7 +11,6 @@ final class Session
      */
     public function __construct(
         private readonly Account $sourceAccount,
-        private readonly Account $selectedAccount,
         private readonly array $fillableAccounts
     ) {
         Assert::allIsInstanceOf($this->fillableAccounts, Account::class);
@@ -25,18 +24,8 @@ final class Session
         return $this->fillableAccounts;
     }
 
-    public function getSelectedAccount(): Account
-    {
-        return $this->selectedAccount;
-    }
-
     public function getSourceAccount(): Account
     {
         return $this->sourceAccount;
-    }
-
-    public function isSourceAccountSelected(): bool
-    {
-        return $this->sourceAccount->equals($this->getSelectedAccount());
     }
 }

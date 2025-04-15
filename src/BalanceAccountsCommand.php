@@ -21,7 +21,11 @@ class BalanceAccountsCommand extends Command
 {
     private const CURRENCY = 'EUR';
 
-    private const DASHBOARD_BASE_URL = 'https://dashboard.uberspace.de/dashboard';
+    private const URL_DASHBOARD_BASE = 'https://dashboard.uberspace.de/dashboard';
+
+    private const URL_OVERVIEW = 'https://dashboard.uberspace.de/meta';
+
+    private const URL_OVERVIEW_SWITCH_ACCOUNT = 'https://dashboard.uberspace.de/meta/switch/%s';
 
     private ?RemoteWebDriver $driver = null;
 
@@ -80,15 +84,12 @@ class BalanceAccountsCommand extends Command
         try {
             $this->initDriver();
 
-            $this->driver->get(self::DASHBOARD_BASE_URL);
-            $this->unfoldAccountsTable();
+            $this->driver->get(self::URL_OVERVIEW);
 
             $session = $this->collectSessionData();
 
-            if (!$session->isSourceAccountSelected()) {
-                $this->output->writeln('Switching to source account...');
-                $session = $this->selectSourceAccount($session->getSourceAccount());
-            }
+            $this->output->writeln('Go to source account dashboard...');
+            $this->selectSourceAccount($session->getSourceAccount());
 
             $this->fillUpAccounts($session);
 
@@ -106,56 +107,55 @@ class BalanceAccountsCommand extends Command
         $sourceAccountName = $this->input->getArgument('source');
         $excludedAccountNames = array_map('strtolower', $this->input->getOption('exclude') ?? []);
         $sourceAccount = null;
-        $selectedAccount = null;
         $targetAccounts = [];
 
-        $accounts = $this->driver->findElements(WebDriverBy::cssSelector('#otheraccounttable tbody tr'));
+        $tableRows = $this->driver->findElements(WebDriverBy::cssSelector('#dotqmailtable tbody tr'));
 
-        foreach ($accounts as $account) {
-            $columns = $account->findElements(WebDriverBy::cssSelector('td'));
+        $isFirst = true;
 
-            $amountInCents = $this->parseCurrency($columns[2]->getText());
-            $priceInCents = $this->parseCurrency($columns[3]->getText());
+        foreach ($tableRows as $tableRow) {
+            if ($isFirst) {
+                $isFirst = false;
+                continue;
+            }
 
-            $account = new Account(
+            $columns = $tableRow->findElements(WebDriverBy::cssSelector('td'));
+
+            $amountInCents = $this->parseCurrency($columns[4]->getText());
+            $priceInCents = $this->parseCurrency($columns[5]->getText());
+
+            $tableRow = new Account(
                 $columns[0]->getText(),
                 $columns[1]->getText(),
                 $amountInCents,
                 $priceInCents
             );
 
-            if (count($columns[0]->findElements(WebDriverBy::tagName('strong'))) === 1) {
-                Assert::null($selectedAccount, 'Duplicated selected account detected!');
-                $selectedAccount = $account;
-            }
-
-            if (in_array(strtolower($account->getName()), $excludedAccountNames, true)) {
-                $this->output->writeln('Excluding account ' . $account->getName());
+            if (in_array(strtolower($tableRow->getName()), $excludedAccountNames, true)) {
+                $this->output->writeln('Excluding account ' . $tableRow->getName());
                 continue;
             }
 
-            if ($account->getName() === $sourceAccountName) {
-                $sourceAccount = $account;
+            if ($tableRow->getName() === $sourceAccountName) {
+                $sourceAccount = $tableRow;
                 continue;
             }
 
-            $targetAccounts[] = $account;
+            $targetAccounts[] = $tableRow;
         }
 
         Assert::notNull($sourceAccount, 'Source account could not be detected: ' . $sourceAccountName);
-        Assert::notNull($selectedAccount, 'The selected account could not be detected.');
         Assert::notEmpty($targetAccounts, 'No target accounts could be detected.');
 
-        $this->output->writeln('Detected source account ' . $sourceAccount->getName());
-        $this->output->writeln('Detected selected account ' . $selectedAccount->getName());
+        $this->output->writeln(sprintf('Detected source account %s with balance of %s', $sourceAccount->getName(), $this->formatCurrency($sourceAccount->getCreditInCents())));
         $this->output->writeln('Detected ' . count($targetAccounts) . ' possible target accounts.');
 
-        return new Session($sourceAccount, $selectedAccount, $targetAccounts);
+        return new Session($sourceAccount, $targetAccounts);
     }
 
     private function fillUpAccount(Account $fillableAccount, int $amountToFillInCents): void
     {
-        $this->driver->get(self::DASHBOARD_BASE_URL . '/accounting');
+        $this->driver->get(self::URL_DASHBOARD_BASE . '/accounting');
         $amountField = $this->driver->findElement(WebDriverBy::id('transfer_money'));
         $amountField->clear();
         $amountField->sendKeys((string)($amountToFillInCents / 100));
@@ -241,16 +241,10 @@ class BalanceAccountsCommand extends Command
         $this->driver = null;
     }
 
-    private function selectSourceAccount(Account $sourceAccount): Session
+    private function selectSourceAccount(Account $sourceAccount): void
     {
-        $this->driver->get(self::DASHBOARD_BASE_URL . '/switch_user?selected_account=' . $sourceAccount->getName());
-        $this->unfoldAccountsTable();
-
-        $updatedSession = $this->collectSessionData();
-
-        Assert::eq($sourceAccount->getName(), $updatedSession->getSelectedAccount()->getName());
-
-        return $updatedSession;
+        $switchAccountUrl = sprintf(self::URL_OVERVIEW_SWITCH_ACCOUNT, $sourceAccount->getName());
+        $this->driver->get($switchAccountUrl);
     }
 
     private function unfoldAccountsTable(): void
