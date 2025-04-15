@@ -60,12 +60,12 @@ Finally download and extract this script an run it (required PHP 8.1+ and Compos
 
 ```bash
 composer install
-./bin/console <sourceAccount> <amountAsFloat>
+./bin/console uberspace:balanceaccount <sourceAccount> <amountAsFloat>
 ```
 
 This will only show you what it would do (dry run). If everything is OK, you can
 execute the fillup process by passing the `-x` Parameter:
 
 ```bash
-./bin/console <sourceAccount> <amountAsFloat> -x
+./bin/console uberspace:balanceaccount <sourceAccount> <amountAsFloat> -x
 ```
