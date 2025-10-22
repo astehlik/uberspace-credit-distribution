@@ -6,8 +6,8 @@ a source account.
 ## Warning
 
 > **Warning**
-> Uberspace currently seems to restructure / translate their dashboard. Therefore 
-> It might be possible this script does not work any more.
+> Uberspace currently seems to restructure / translate their dashboard. Therefore,
+> it might be possible this script does not work anymore.
 > Please create an issue when you experience problems.
 
 ## Example:
@@ -22,23 +22,23 @@ After running this script, both target accounts will have a credit of 15 €:
 php bin/console uberspace:balanceaccount uber2 15 -x
 ```
 
-* 5 € will be transferred from `uber2` to `uber1`
-* 3 € will be transferred from `uber2` to `uber3`
+* Five Euros (5,00 €) will be transferred from `uber2` to `uber1`
+* Three Euros (3,00 €) will be transferred from `uber2` to `uber3`
 
 ## How To
 
 ### Log in
 
-This Howto is based on Firefox but should work similar with Chrome based
+This Howto is based on Firefox but should work similar with Chrome-based 
 browsers.
 
-First, start Firefox with enabled remote control server:
+First, start Firefox with the remote control server enabled:
 
 ```bash
 firefox --marionette
 ```
 
-Now log on to the [Userspace Dashboard](https://dashboard.uberspace.de) with your OpenId.
+Now log on to the [Userspace Dashboard](https://dashboard.uberspace.de).
 You should be able to switch to all the accounts that you want to fill up and to
 the source account.
 
@@ -56,10 +56,17 @@ You can find out the port by visiting [about:config](about:config) and searching
 
 ### Install and run this script
 
-Finally download and extract this script an run it (required PHP 8.1+ and Composer installed):
+Clone the repository and install the Composer dependencies (requires PHP 8.1+ and Composer installed):
 
 ```bash
-composer install
+git clone https://github.com/astehlik/uberspace-credit-distribution.git
+cd uberspace-credit-distribution
+composer install --no-dev
+```
+
+Now you can run the script:
+
+```bash
 ./bin/console uberspace:balanceaccount <sourceAccount> <amountAsFloat>
 ```
 
