@@ -56,7 +56,7 @@ You can find out the port by visiting [about:config](about:config) and searching
 
 ### Install and run this script
 
-Clone the repository and install the Composer dependencies (requires PHP 8.1+ and Composer installed):
+Clone the repository and install the Composer dependencies (requires PHP 8.2+ and Composer installed):
 
 ```bash
 git clone https://github.com/astehlik/uberspace-credit-distribution.git
