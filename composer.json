@@ -23,7 +23,7 @@
         "symfony/framework-bundle": "^7.0",
         "symfony/runtime": "^7.0",
         "symfony/yaml": "^7.0",
-        "webmozart/assert": "^1.11"
+        "webmozart/assert": "^2.0"
     },
     "config": {
         "allow-plugins": {
